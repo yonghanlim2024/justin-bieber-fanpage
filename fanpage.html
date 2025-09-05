@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Justin Bieber Fan Page · Belieber Hub</title>
+  <meta name="description" content="A lightweight Justin Bieber fan page prototype using only HTML, CSS, and JavaScript." />
+
+  <!--
+    Rapid prototype: Justin Bieber fan page
+    Tech: vanilla HTML, CSS, JavaScript (single file)
+    Notes:
+      1) Replace placeholder images with your own in the Gallery and Albums sections.
+      2) Update links to official socials and videos.
+      3) Everything is local except YouTube embeds.
+  -->
+
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #11141b;
+      --panel-2: #151a24;
+      --text: #e9edf3;
+      --muted: #9aa6b2;
+      --brand: #a78bfa;
+      --brand-2: #60a5fa;
+      --accent: #22d3ee;
+      --ok: #34d399;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --border: #222a36;
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    .light {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-2: #f1f5f9;
+      --text: #0b1220;
+      --muted: #4b5563;
+      --brand: #6d28d9;
+      --brand-2: #1d4ed8;
+      --accent: #0891b2;
+      --border: #e5e7eb;
+      --shadow: 0 10px 25px rgba(2,6,23,.08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -20%, rgba(167,139,250,.15), transparent 60%),
+                  radial-gradient(900px 600px at -10% 10%, rgba(96,165,250,.18), transparent 50%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: var(--brand-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Layout */
+    .container { width: min(1100px, 92vw); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px);
+      background: color-mix(in oklab, var(--bg) 80%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .2px; }
+    .brand-badge {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: conic-gradient(from 200deg, var(--brand), var(--brand-2), var(--accent));
+      box-shadow: var(--shadow);
+    }
+    nav ul { display: flex; gap: 16px; list-style: none; margin: 0; padding: 0; }
+    nav a { padding: 8px 12px; border-radius: 10px; color: var(--text); border: 1px solid transparent; }
+    nav a:hover { background: var(--panel-2); border-color: var(--border); text-decoration: none; }
+
+    .actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      appearance: none; border: 1px solid var(--border); color: var(--text);
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border-radius: 12px; padding: 9px 14px; cursor: pointer; font-weight: 600;
+      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      box-shadow: 0 2px 0 rgba(2,6,23,.15);
+    }
+    .btn:hover { transform: translateY(-1px); border-color: color-mix(in oklab, var(--brand) 50%, var(--border)); }
+    .btn.primary { background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 50%, #000), color-mix(in oklab, var(--brand-2) 70%, #000)); border-color: transparent; }
+    .btn.ghost { background: transparent; }
+
+    /* Hero */
+    .hero { padding: 48px 0 24px; display: grid; grid-template-columns: 1.2fr .8fr; gap: 22px; align-items: center; }
+    .hero-card {
+      background: linear-gradient(170deg, color-mix(in oklab, var(--panel) 70%, transparent), var(--panel-2));
+      border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);
+    }
+    .kicker { display: inline-flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+    .k-dot { width: 8px; height: 8px; border-radius: 3px; background: linear-gradient(135deg, var(--brand), var(--accent)); box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 30%, transparent); }
+    h1 { font-size: clamp(28px, 5vw, 46px); line-height: 1.15; margin: 10px 0 14px; }
+    .sub { color: var(--muted); max-width: 60ch; }
+    .hero-cta { display: flex; gap: 10px; margin: 18px 0 0; flex-wrap: wrap; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+    .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+    .stat b { font-size: 20px; }
+    .stat span { display: block; color: var(--muted); font-size: 12px; }
+
+    .hero-art {
+      display: grid; place-items: center; border-radius: var(--radius);
+      background: linear-gradient(160deg, color-mix(in oklab, var(--brand) 18%, transparent), transparent 40%),
+                  radial-gradient(600px 400px at 60% 0%, color-mix(in oklab, var(--brand-2) 24%, transparent), transparent 55%);
+      border: 1px solid var(--border); overflow: hidden; min-height: 320px; position: relative;
+    }
+    .hero-vinyl {
+      width: clamp(180px, 40vw, 300px); aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #111 0 6%, #000 7% 35%, #0a0a0a 36% 60%, #000 61%),
+                  repeating-conic-gradient(from 0deg, rgba(255,255,255,.03) 0 2deg, rgba(0,0,0,0) 2deg 4deg);
+      border: 10px solid #121212; box-shadow: 0 20px 50px rgba(0,0,0,.45);
+      position: relative;
+    }
+    .hero-vinyl::after { content: "JB"; position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%);
+      width: 34%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+      background: radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--brand) 50%, #000), color-mix(in oklab, var(--brand-2) 60%, #000));
+      color: white; font-weight: 900; letter-spacing: .1em; }
+
+    /* Sections */
+    section { padding: 42px 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: clamp(20px, 4vw, 28px); }
+    .muted { color: var(--muted); font-size: 14px; }
+    .cards { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+    .card { grid-column: span 4; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .card-media { aspect-ratio: 16/9; background: linear-gradient(120deg, var(--panel-2), color-mix(in oklab, var(--brand) 18%, var(--panel-2))); position: relative; }
+    .play { position: absolute; inset: auto 12px 12px auto; background: rgba(2,6,23,.7); border: 1px solid var(--border); padding: 8px 10px; border-radius: 10px; font-size: 12px; }
+    .card-body { padding: 12px; display: grid; gap: 4px; }
+    .tag { font-size: 11px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 999px; width: fit-content; color: var(--muted); }
+
+    /* Albums scroller */
+    .scroller { display: grid; grid-auto-flow: column; grid-auto-columns: 190px; gap: 12px; overflow-x: auto; padding: 6px 2px 6px 2px; scroll-snap-type: x mandatory; }
+    .album { scroll-snap-align: start; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--panel); }
+    .cover { aspect-ratio: 1; background: repeating-linear-gradient(45deg, color-mix(in oklab, var(--brand) 25%, #000) 0 10px, color-mix(in oklab, var(--brand-2) 25%, #000) 10px 20px); display: grid; place-items: center; font-weight: 800; font-size: 22px; }
+    .album .meta { padding: 10px; display: grid; gap: 2px; }
+    .album .meta .year { color: var(--muted); font-size: 12px; }
+
+    /* Timeline */
+    .timeline { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .t-item { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: start; }
+    .t-year { font-weight: 800; color: var(--brand-2); }
+    .t-card { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: 12px; padding: 10px 12px; }
+
+    /* Gallery */
+    .gallery { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; }
+    .g-item { grid-column: span 4; aspect-ratio: 4/3; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); position: relative; cursor: zoom-in; }
+    .g-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .g-item::after { content: "View"; position: absolute; inset: auto 10px 10px auto; padding: 6px 10px; font-size: 12px; background: rgba(2,6,23,.7); border-radius: 999px; border: 1px solid var(--border); }
+
+    /* Quiz */
+    .quiz { display: grid; gap: 12px; }
+    .q { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
+    .q h4 { margin: 0 0 6px; }
+    .quiz button { width: fit-content; }
+    .score { font-weight: 700; }
+
+    /* Guestbook */
+    .guestbook { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .guest-form { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: grid; gap: 10px; }
+    .guest-form input, .guest-form textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+    .guest-list { display: grid; gap: 10px; }
+    .g-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: grid; gap: 4px; }
+    .g-meta { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal.open { display: flex; }
+    .modal-card { background: #000; border-radius: 14px; max-width: min(1100px, 92vw); width: 100%; overflow: hidden; border: 1px solid #222; box-shadow: var(--shadow); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #0b0b0b; color: #fff; }
+    .modal-body { position: relative; }
+    .modal-body iframe, .modal-body img { display: block; width: 100%; height: min(65vh, 70vw * 9/16); }
+
+    /* Footer */
+    footer { padding: 30px 0 60px; text-align: center; color: var(--muted); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .cards .card { grid-column: span 6; }
+      .g-item { grid-column: span 6; }
+      .guestbook { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      nav ul { display: none; }
+      .cards .card { grid-column: span 12; }
+      .g-item { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand"><span class="brand-badge" aria-hidden="true"></span> Belieber Hub</div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="#music">Music</a></li>
+          <li><a href="#albums">Albums</a></li>
+          <li><a href="#timeline">Timeline</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#quiz">Quiz</a></li>
+          <li><a href="#guestbook">Guestbook</a></li>
+        </ul>
+      </nav>
+      <div class="actions">
+        <button id="themeBtn" class="btn ghost" aria-label="Toggle theme">Theme</button>
+        <button id="likeBtn" class="btn" title="Increase your Belieber level">💜 <span id="likeCount">0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="home">
+      <div class="hero-card">
+        <div class="kicker"><span class="k-dot" aria-hidden="true"></span><span>Fan built</span><span>Unofficial</span></div>
+        <h1>Justin Bieber</h1>
+        <p class="sub">Welcome to a clean, fast fan page template for the global pop icon. Explore top tracks, browse albums, relive key milestones, and sign the guestbook.</p>
+        <div class="hero-cta">
+          <button class="btn primary" data-youtube="https://www.youtube.com/embed/tQ0yjYUFKAE?autoplay=1">Play "Peaches" MV</button>
+          <a class="btn" href="#guestbook">Join the fandom</a>
+          <a class="btn ghost" href="#quiz">Take the quiz</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b id="statYears">15+</b><span>Years active</span></div>
+          <div class="stat"><b>Millions</b><span>Beliebers</span></div>
+          <div class="stat"><b>Global</b><span>Tours & hits</span></div>
+        </div>
+      </div>
+      <div class="hero-art"><div class="hero-vinyl" aria-hidden="true"></div></div>
+    </section>
+
+    <!-- MUSIC -->
+    <section id="music">
+      <div class="section-head">
+        <h2>Top Tracks</h2>
+        <div class="muted">Tap play to watch official videos in a modal.</div>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="card-media" role="img" aria-label="Peaches video thumbnail">
+            <button class="play" data-youtube="https://www.youtube.com/embed/tQ0yjYUFKAE?autoplay=1">▶ Play</button>
+          </div>
+          <div class="card-body">
+            <span class="tag">R&B Pop</span>
+            <strong>Peaches</strong>
+            <span class="muted">feat. Daniel Caesar, Giveon</span>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-media" role="img" aria-label="Sorry video thumbnail">
+            <button class="play" data-youtube="https://www.youtube.com/embed/fRh_vgS2dFE?autoplay=1">▶ Play</button>
+          </div>
+          <div class="card-body">
+            <span class="tag">Dance Pop</span>
+            <strong>Sorry</strong>
+            <span class="muted">Iconic dance video</span>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-media" role="img" aria-label="Love Yourself video thumbnail">
+            <button class="play" data-youtube="https://www.youtube.com/embed/oyEuk8j8imI?autoplay=1">▶ Play</button>
+          </div>
+          <div class="card-body">
+            <span class="tag">Acoustic Pop</span>
+            <strong>Love Yourself</strong>
+            <span class="muted">Songwriting vibes</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ALBUMS -->
+    <section id="albums">
+      <div class="section-head">
+        <h2>Albums</h2>
+        <div class="muted">Horizontal scroll. Replace covers with real artwork later.</div>
+      </div>
+      <div class="scroller" aria-label="Albums scroller">
+        <div class="album">
+          <div class="cover" aria-label="My World">My World</div>
+          <div class="meta"><strong>My World</strong><span class="year">2009</span></div>
+        </div>
+        <div class="album">
+          <div class="cover" aria-label="Believe">Believe</div>
+          <div class="meta"><strong>Believe</strong><span class="year">2012</span></div>
+        </div>
+        <div class="album">
+          <div class="cover" aria-label="Purpose">Purpose</div>
+          <div class="meta"><strong>Purpose</strong><span class="year">2015</span></div>
+        </div>
+        <div class="album">
+          <div class="cover" aria-label="Changes">Changes</div>
+          <div class="meta"><strong>Changes</strong><span class="year">2020</span></div>
+        </div>
+        <div class="album">
+          <div class="cover" aria-label="Justice">Justice</div>
+          <div class="meta"><strong>Justice</strong><span class="year">2021</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section id="timeline">
+      <div class="section-head">
+        <h2>Timeline</h2>
+        <div class="muted">Sample milestones. Edit as needed.</div>
+      </div>
+      <div class="timeline">
+        <div class="t-item"><div class="t-year">2009</div><div class="t-card">Debut EP My World sparks breakthrough.</div></div>
+        <div class="t-item"><div class="t-year">2010</div><div class="t-card">Global hit Baby introduces millions to the Belieber era.</div></div>
+        <div class="t-item"><div class="t-year">2015</div><div class="t-card">Purpose era fuels a wave of chart toppers and tours.</div></div>
+        <div class="t-item"><div class="t-year">2020</div><div class="t-card">Changes brings a mellow R&B color to his catalog.</div></div>
+        <div class="t-item"><div class="t-year">2021</div><div class="t-card">Justice lands with hits like Peaches and Ghost.</div></div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery">
+      <div class="section-head">
+        <h2>Gallery</h2>
+        <div class="muted">Click to open. Swap these placeholders with your photos.</div>
+      </div>
+      <div class="gallery">
+        <figure class="g-item"><img src="https://picsum.photos/seed/jb1/800/600" alt="Concert moment 1" data-full="https://picsum.photos/seed/jb1/1600/1200"></figure>
+        <figure class="g-item"><img src="https://picsum.photos/seed/jb2/800/600" alt="Concert moment 2" data-full="https://picsum.photos/seed/jb2/1600/1200"></figure>
+        <figure class="g-item"><img src="https://picsum.photos/seed/jb3/800/600" alt="Concert moment 3" data-full="https://picsum.photos/seed/jb3/1600/1200"></figure>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz">
+      <div class="section-head">
+        <h2>Mini Quiz</h2>
+        <div class="muted">3 quick ones. No scoring pressure here.</div>
+      </div>
+      <form class="quiz" id="quizForm">
+        <div class="q">
+          <h4>1) Which era features the single Peaches?</h4>
+          <label><input type="radio" name="q1" value="0"> My World</label><br>
+          <label><input type="radio" name="q1" value="0"> Purpose</label><br>
+          <label><input type="radio" name="q1" value="1"> Justice</label>
+        </div>
+        <div class="q">
+          <h4>2) Which track includes the lyric My mama don't like you?</h4>
+          <label><input type="radio" name="q2" value="1"> Love Yourself</label><br>
+          <label><input type="radio" name="q2" value="0"> Sorry</label><br>
+          <label><input type="radio" name="q2" value="0"> Yummy</label>
+        </div>
+        <div class="q">
+          <h4>3) What is the informal name for Justin's fan community?</h4>
+          <label><input type="radio" name="q3" value="1"> Beliebers</label><br>
+          <label><input type="radio" name="q3" value="0"> Swifties</label><br>
+          <label><input type="radio" name="q3" value="0"> Army</label>
+        </div>
+        <button type="submit" class="btn primary">Check score</button>
+        <span class="score" id="quizScore" aria-live="polite"></span>
+      </form>
+    </section>
+
+    <!-- GUESTBOOK -->
+    <section id="guestbook">
+      <div class="section-head">
+        <h2>Guestbook</h2>
+        <div class="muted">Say hi. Your message is stored locally in your browser.</div>
+      </div>
+      <div class="guestbook">
+        <form class="guest-form" id="guestForm">
+          <input type="text" id="name" placeholder="Your name" required>
+          <textarea id="message" placeholder="Message" rows="4" required></textarea>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn primary" type="submit">Sign</button>
+            <button class="btn ghost" type="button" id="clearAll">Clear all</button>
+          </div>
+          <div class="muted">Pro tip: click the purple heart at the top to level up.</div>
+        </form>
+        <div class="guest-list" id="guestList" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Built with pure HTML, CSS, and JavaScript. Not affiliated with or endorsed by Justin Bieber. For personal fan use.
+    <div style="margin-top:8px;">
+      <a href="#home">Back to top</a>
+    </div>
+  </footer>
+
+  <!-- Modal root -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div id="modalTitle">Now Playing</div>
+        <button class="btn ghost" id="modalClose">Close</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    // Utility: el helpers
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+    // Smooth scroll for anchors
+    $$('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href');
+        if (id.length > 1) {
+          e.preventDefault();
+          const el = $(id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Theme toggle
+    const themeBtn = $('#themeBtn');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') document.body.classList.add('light');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+    });
+
+    // Like counter
+    const likeBtn = $('#likeBtn');
+    const likeCount = $('#likeCount');
+    const savedLikes = Number(localStorage.getItem('belieberLikes') || 0);
+    likeCount.textContent = savedLikes;
+    likeBtn.addEventListener('click', () => {
+      const n = Number(localStorage.getItem('belieberLikes') || 0) + 1;
+      localStorage.setItem('belieberLikes', n);
+      likeCount.textContent = n;
+      likeBtn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }], { duration: 180 });
+    });
+
+    // Years active dynamic estimate
+    const startYear = 2009;
+    const years = new Date().getFullYear() - startYear;
+    $('#statYears').textContent = years + '+';
+
+    // Modal logic for YouTube and images
+    const modal = $('#modal');
+    const modalBody = $('#modalBody');
+    const modalTitle = $('#modalTitle');
+    const modalClose = $('#modalClose');
+
+    function openModal(contentEl, title='Now Playing') {
+      modalTitle.textContent = title;
+      modalBody.innerHTML = '';
+      modalBody.appendChild(contentEl);
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      modalBody.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+    // Attach video launchers
+    $$('.play, .hero-cta .btn.primary').forEach(btn => {
+      const url = btn.dataset.youtube;
+      if (!url) return;
+      btn.addEventListener('click', () => {
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.setAttribute('title', 'YouTube video');
+        iframe.setAttribute('frameborder', '0');
+        openModal(iframe, 'YouTube');
+      });
+    });
+
+    // Gallery lightbox
+    $$('#gallery .g-item img').forEach(img => {
+      img.addEventListener('click', () => {
+        const full = document.createElement('img');
+        full.src = img.dataset.full || img.src;
+        full.alt = img.alt;
+        openModal(full, 'Photo');
+      });
+    });
+
+    // Quiz scoring
+    $('#quizForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const values = ['q1','q2','q3'].map(n => Number((new FormData(e.target)).get(n) || 0));
+      const score = values.reduce((a,b) => a+b, 0);
+      const msg = `Score: ${score}/3` + (score === 3 ? ' Perfect!' : score === 2 ? ' Great job!' : ' Keep going.');
+      $('#quizScore').textContent = msg;
+    });
+
+    // Guestbook: local storage CRUD
+    const GB_KEY = 'belieberGuestbookV1';
+    const guestForm = $('#guestForm');
+    const guestList = $('#guestList');
+    const clearAll = $('#clearAll');
+
+    function loadPosts() {
+      try { return JSON.parse(localStorage.getItem(GB_KEY) || '[]'); } catch { return []; }
+    }
+    function savePosts(items) { localStorage.setItem(GB_KEY, JSON.stringify(items)); }
+
+    function renderPosts() {
+      const items = loadPosts();
+      guestList.innerHTML = '';
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'muted';
+        empty.textContent = 'No messages yet. Be the first to sign it.';
+        guestList.appendChild(empty);
+        return;
+      }
+      items.forEach((it, idx) => {
+        const card = document.createElement('div');
+        card.className = 'g-card';
+        const meta = document.createElement('div');
+        meta.className = 'g-meta';
+        const who = document.createElement('strong');
+        who.textContent = it.name || 'Anon';
+        const when = document.createElement('span');
+        when.className = 'muted';
+        when.textContent = new Date(it.ts).toLocaleString();
+        meta.appendChild(who);
+        meta.appendChild(when);
+
+        const msg = document.createElement('p');
+        msg.textContent = it.message;
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '8px';
+        const like = document.createElement('button');
+        like.className = 'btn ghost';
+        like.textContent = `💖 ${it.likes || 0}`;
+        like.addEventListener('click', () => {
+          const arr = loadPosts();
+          arr[idx].likes = (arr[idx].likes || 0) + 1;
+          savePosts(arr);
+          renderPosts();
+        });
+        const del = document.createElement('button');
+        del.className = 'btn ghost';
+        del.textContent = 'Delete';
+        del.addEventListener('click', () => {
+          const arr = loadPosts();
+          arr.splice(idx, 1);
+          savePosts(arr);
+          renderPosts();
+        });
+        row.appendChild(like);
+        row.appendChild(del);
+
+        card.appendChild(meta);
+        card.appendChild(msg);
+        card.appendChild(row);
+        guestList.appendChild(card);
+      });
+    }
+
+    guestForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = $('#name').value.trim();
+      const message = $('#message').value.trim();
+      if (!message) return;
+      const items = loadPosts();
+      items.unshift({ name, message, ts: Date.now(), likes: 0 });
+      savePosts(items);
+      guestForm.reset();
+      renderPosts();
+    });
+
+    clearAll.addEventListener('click', () => {
+      if (confirm('Clear all guestbook messages on this device?')) {
+        localStorage.removeItem(GB_KEY);
+        renderPosts();
+      }
+    });
+
+    renderPosts();
+  </script>
+</body>
+</html>
